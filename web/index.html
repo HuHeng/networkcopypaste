@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title></title>
+    <script>
+      async function getlatesttext() {
+          //fetch
+          const response = await fetch('/api/gettext');
+          const latesttext = await response.text();
+          return latesttext;
+      }
+
+      async function pushtext(text) {
+          //push
+          const response = await fetch('/api/pushtext', {
+              method: 'POST',
+              body: text
+          });
+          return await response.text();
+      }
+
+
+      async function copytext() {
+          //copy
+          text = document.getElementById("txtCon").value;
+          if(typeof text == "undefined" || text == null || text == ""){
+              console.log("text: ", text, "text null, done");
+              return
+          }
+          console.log("text: ", text);
+          await pushtext(text);
+      }
+
+      async function pastetext() {
+          text = await getlatesttext();
+          document.getElementById("txtCon").value = text;
+          console.log("paste text:", text);
+      }
+
+      function load() {
+        console.log("load event detected!");
+        //get the latest text from server
+        //document.getElementById("txtCon").value = "";
+      }
+      window.onload = load;
+
+    </script>
+</head>
+<body>
+    <textarea id="txtCon" rows="50" cols="100" ></textarea>
+    <button id="copybtn" type="button"  onclick="copytext()">copy</button>
+    <button id="pastebtn" type="button" onclick="pastetext()">paste</button>
+</body>
+</html>
