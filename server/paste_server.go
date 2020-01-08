@@ -10,28 +10,33 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-const MaxListSize int = 5
+const MaxListSize int = 50
 
 func main() {
 	textList := []string{}
-	mutex := sync.Mutex{}
+	mutex := sync.RWMutex{}
 
 	router := gin.Default()
 	router.Use(static.Serve("/", static.LocalFile("../web", true)))
+//        index := 0
 
 	api := router.Group("/api")
 	{
 		api.GET("/gettext", func(c *gin.Context) {
 			var text string = ""
 
-			mutex.Lock()
+			mutex.RLock()
 			if len(textList) > 0 {
 				text = textList[len(textList)-1]
 			}
 			fmt.Printf("len of text list: %v \n", len(textList))
-			mutex.Unlock()
+			mutex.RUnlock()
 
 			c.String(http.StatusOK, text)
+		})
+		
+		api.GET("/back", func(c *gin.Context){
+			c.String(http.StatusOK,"")
 		})
 
 		api.POST("/pushtext", func(c *gin.Context) {
